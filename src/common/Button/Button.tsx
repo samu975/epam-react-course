@@ -1,10 +1,11 @@
 import React from 'react';
 
 interface ButtonProps {
-	buttonText: string;
-	onClick?: () => void;
-	disabled?: boolean;
-	className?: string;
+  buttonText: string;
+  onClick: () => void;
+  disabled?: boolean;
+  className?: string;
+  type?: "button" | "submit" | "reset";
 }
 
 const Button = (props: ButtonProps): JSX.Element => {

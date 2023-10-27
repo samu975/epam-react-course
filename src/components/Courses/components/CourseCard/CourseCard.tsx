@@ -38,43 +38,47 @@ const getCreationDate = (creationDate: string): string => {
 };
 
 const CourseCard = ({
-	title,
-	description,
-	authors,
-	duration,
-	createdAt,
-}: CourseCardProps): JSX.Element => {
-	return (
-		<>
-			<section className='courses p-4 flex gap-4 border border-solid border-blue-300 mx-4 borer my-6 rounded-lg'>
-				<div className='flex flex-col flex-1'>
-					<h2 className='font-bold text-2xl my-4 ml-4'>{title}</h2>
-					<p className='px-4 w-10/12'>{description}</p>
-				</div>
-				<div className='flex flex-2 flex-col justify-center px-4 items-center min-w-[250px] max-w-[250px]'>
-					<div className='my-4'>
-						<p>
-							<strong>Authors: </strong>
-							{showAuthors(authors.map((author) => author.name))}
-						</p>
-						<p>
-							<strong>Duration: </strong>
-							{getDurationInHours(duration)}
-						</p>
-						<p>
-							<strong>Created at: </strong>
-							{getCreationDate(createdAt)}
-						</p>
-					</div>
-					<Button
-						buttonText='Show course'
-						className='bg-cyan-500 text-white p-2 rounded-md'
-						disabled={true}
-					/>
-				</div>
-			</section>
-		</>
-	);
+  title,
+  description,
+  authors,
+  duration,
+  createdAt,
+  id,
+}: CourseCardInterface) => {
+  const navigate = useNavigate();
+  return (
+    <>
+      <section className="courses p-4 flex gap-4 border border-solid border-blue-300 mx-4 borer my-6 rounded-lg">
+        <div className="flex flex-col flex-1">
+          <h2 className="font-bold text-2xl my-4 ml-4">{title}</h2>
+          <p className="px-4 w-10/12">{description}</p>
+        </div>
+        <div className="flex flex-2 flex-col justify-center px-4 items-center">
+          <div className="my-4">
+            <p>
+              <strong>Authors: </strong>
+              {authors}
+            </p>
+            <p>
+              <strong>Duration: </strong>
+              {duration}
+            </p>
+            <p>
+              <strong>Created at: </strong>
+              {createdAt}
+            </p>
+          </div>
+          <Button
+            buttonText="Show course"
+            onClick={() => {
+              navigate(`${id}`);
+            }}
+            className="bg-cyan-500 text-white p-2 rounded-md"
+          />
+        </div>
+      </section>
+    </>
+  );
 };
 
 export default CourseCard;
