@@ -1,94 +1,111 @@
-import React, { useState, useEffect } from "react";
-import CourseCard from "./components/CourseCard/CourseCard";
+import React, { useState, useEffect } from 'react';
+import CourseCard from './components/CourseCard/CourseCard';
 import {
-  mockedCoursesList,
-  mockedAuthorsList,
-} from "../../helpers/mocks/mocks";
-import Input from "../../common/Input/Input";
-import Button from "../../common/Button/Button";
-import { useNavigate } from "react-router-dom";
+	mockedCoursesList,
+	mockedAuthorsList,
+} from '../../helpers/mocks/mocks';
+import Input from '../../common/Input/Input';
+import Button from '../../common/Button/Button';
+import { useNavigate } from 'react-router-dom';
 
-const Courses = () => {
-  const [courses, setCourses] = useState(mockedCoursesList);
+interface Course {
+	title: string;
+	authors: {
+		id: string;
+		name: string;
+	}[];
+	description: string;
+	duration: number;
+	creationDate: string;
+	id: string;
+}
 
-  const navigate = useNavigate();
-  const getAuthorNames = (authorIds: string[]) => {
-    return mockedAuthorsList
-      .filter((author) => authorIds.includes(author.id))
-      .map((author) => author.name);
-  };
+const getAuthorNames = (
+	authorIdsOrNames: (string | { id: string; name: string })[]
+): { id: string; name: string }[] => {
+	return authorIdsOrNames.map((authorIdOrName) => {
+		if (typeof authorIdOrName === 'string') {
+			const author = mockedAuthorsList.find((a) => a.id === authorIdOrName);
+			return author
+				? { id: author.id, name: author.name }
+				: { id: '', name: authorIdOrName };
+		} else {
+			return authorIdOrName;
+		}
+	});
+};
 
-  const showAuthors = (authors: string[]) => {
-    return authors.map((author, index) => (
-      <span key={index}>
-        {author}
-        {index < authors.length - 1 ? ", " : ""}
-      </span>
-    ));
-  };
+const Courses = (): JSX.Element => {
+	const [courses, setCourses] = useState(() => {
+		return mockedCoursesList.map((course) => ({
+			...course,
+			authors: getAuthorNames(course.authors),
+		}));
+	});
 
-  const getDurationInHours = (duration: number): string => {
-    const hours = Math.floor(duration / 60);
-    const minutes = duration % 60;
-    return `${hours}:${minutes.toString().padStart(2, "0")} hours`;
-  };
+	const navigate = useNavigate();
 
-  const getCreationDate = (creationDate: string): string => {
-    const date = new Date(creationDate);
-    const day = date.getDate().toString().padStart(2, "0");
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const year = date.getFullYear();
-    return `${day}.${month}.${year}`;
-  };
+	useEffect(() => {
+		const storedCourses = localStorage.getItem('courses');
+		if (storedCourses) {
+			const parsedCourses: Course[] = JSON.parse(storedCourses);
 
-  useEffect(() => {
-    const storedCourses = localStorage.getItem("course");
-    if (storedCourses) {
-      const parsedCourses = JSON.parse(storedCourses);
-      setCourses([...mockedCoursesList, parsedCourses]);
-    }
-  }, []);
+			// Existia un bug extraño donde duplicaba los cursos, por eso hago este chequeo
+			setCourses((prevState) => {
+				const combinedCourses = [...prevState, ...parsedCourses];
+				const uniqueCourses = Array.from(
+					new Set(combinedCourses.map((course) => course.id))
+				).map((id) => {
+					const course = combinedCourses.find((course) => course.id === id);
+					if (!course) {
+						throw new Error(`Course not found for id ${id}`);
+					}
+					return course;
+				});
 
-  console.log(courses);
-  return (
-    <>
-      <section className="p-4 w-full flex justify-between">
-        <div>
-          <Input
-            id="searchInput"
-            className="border-solid border border-gray-400 w-72 p-2 text-sm"
-            type="text"
-          />
-          <Button
-            buttonText="Search"
-            onClick={() => {}}
-            className="py-2 px-8 ml-4 rounded-md bg-blue-700 text-white"
-          />
-        </div>
-        <div>
-          <Button
-            buttonText="Add new course"
-            onClick={() => {
-              navigate("add-new-course");
-            }}
-            className="py-2 px-8 rounded-md bg-cyan-500 text-white"
-          />
-        </div>
-      </section>
-      <div>
-        {courses.map((course) => (
-          <CourseCard
-            key={course.id}
-            title={course.title}
-            description={course.description}
-            authors={showAuthors(getAuthorNames(course.authors))}
-            duration={getDurationInHours(course.duration)}
-            createdAt={getCreationDate(course.creationDate)}
-          />
-        ))}
-      </div>
-    </>
-  );
+				return uniqueCourses;
+			});
+		}
+	}, []);
+
+	return (
+		<>
+			<section className='p-4 w-full flex justify-between'>
+				<div>
+					<Input
+						id='searchInput'
+						className='border-solid border border-gray-400 w-72 p-2 text-sm'
+						type='text'
+					/>
+					<Button
+						buttonText='Search'
+						className='py-2 px-8 ml-4 rounded-md bg-blue-700 text-white'
+					/>
+				</div>
+				<div>
+					<Button
+						buttonText='Add new course'
+						onClick={() => {
+							navigate('add-new-course');
+						}}
+						className='py-2 px-8 rounded-md bg-cyan-500 text-white'
+					/>
+				</div>
+			</section>
+			<div>
+				{courses.map((course) => (
+					<CourseCard
+						key={course.id}
+						title={course.title}
+						description={course.description}
+						authors={course.authors}
+						duration={course.duration}
+						createdAt={course.creationDate}
+					/>
+				))}
+			</div>
+		</>
+	);
 };
 
 export default Courses;
