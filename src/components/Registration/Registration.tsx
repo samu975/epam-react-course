@@ -3,8 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import Input from '../../common/Input/Input';
 import Button from '../../common/Button/Button';
 import Header from '../Header/Header';
-import axios from 'axios';
 import { MoonLoader } from 'react-spinners';
+import { register } from '../../services';
 
 const Registration = (): JSX.Element => {
 	const navigate = useNavigate();
@@ -16,22 +16,18 @@ const Registration = (): JSX.Element => {
 	const [error, setError] = useState<string>('');
 	const [success, setSuccess] = useState<string>('');
 
-	const submitForm = (): void => {
-		setLoading(true);
-		axios
-			.post('http://localhost:4000/register', {
-				name: name,
-				email: email,
-				password: password,
-			})
-			.then((response) => {
-				setSuccess(response.data.result);
-				setLoading(false);
-				redirect();
-			})
-			.catch((error) => {
-				setError(error.response.data.errors[0]);
-			});
+	const onSubmitForm = async (): Promise<void> => {
+		try {
+			setLoading(true);
+			const response = await register(name, email, password);
+			setSuccess(response.result);
+			redirect();
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		} catch (error: any) {
+			setError(error.response.data.errors[0]);
+		} finally {
+			setLoading(false);
+		}
 	};
 
 	const validateForm = (): boolean => {
@@ -66,7 +62,7 @@ const Registration = (): JSX.Element => {
 						onSubmit={(e) => {
 							e.preventDefault();
 							if (validateForm()) {
-								submitForm();
+								onSubmitForm();
 							}
 						}}
 					>

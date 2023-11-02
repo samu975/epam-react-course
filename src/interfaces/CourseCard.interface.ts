@@ -1,13 +1,9 @@
-interface Author {
-	id: string;
-	name: string;
-}
-
 export interface CourseCardInterface {
 	id: string;
 	title: string;
 	description: string;
-	authors: Author[];
+	authors: string[];
 	duration: number;
 	createdAt: string;
+	deleteCourseFn: (id: string) => void;
 }

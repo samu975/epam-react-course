@@ -1,92 +1,39 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Header from '../Header/Header';
-import {
-	mockedAuthorsList,
-	mockedCoursesList,
-} from '../../helpers/mocks/mocks';
 import { CourseInfoInterface } from '../../interfaces/index.interface';
-
-// interface LocalStorageCourse {
-// 	title: string;
-// 	description: string;
-// 	id: string;
-// 	duration: string;
-// 	creationDate: string;
-// 	authors: {
-// 		id: string;
-// 		name: string;
-// 	};
-// }
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store/rootReducer';
 
 const CourseIngo = (): JSX.Element => {
-	// 	useState<LocalStorageCourse[]>();
-	// const { courseId } = useParams();
-	// Tuve muchos errores al momento de colocarle tipado a esto. Me frustre y le puse any, si podrias darme una sugerencia de como solucionar este tipado, te lo agradeceria
-
-	// eslint-disable-next-line
-	const [coursesInLocalStorage, setCoursesInLocalStorage] = useState<any>();
 	const { courseId } = useParams();
+
 	const [courseInfo, setCourseInfo] = useState<CourseInfoInterface>(
 		{} as CourseInfoInterface
 	);
-
-	interface Author {
-		id: string;
-		name: string;
-	}
-
-	type AuthorType = string | Author;
+	const courses = useSelector((state: RootState) => state.courses);
+	const authorsInRedux = useSelector((state: RootState) => state.authors);
 
 	const { id, title, description, creationDate, duration, authors } =
 		courseInfo;
 
-	const getAuthorNames = (authorId: string): string => {
-		const author = mockedAuthorsList.find((a) => a.id === authorId);
-		if (author) {
-			return author.name;
-		} else {
-			return authorId;
-		}
-	};
-
 	const getCourseInfo = useCallback(() => {
-		let course;
-		if (coursesInLocalStorage) {
-			course = coursesInLocalStorage.find(
-				(course: CourseInfoInterface) => course.id === courseId
-			);
-		}
-		if (!course) {
-			course = mockedCoursesList.find((course) => course.id === courseId);
-		}
+		const course = courses.find((course) => course.id === courseId);
 		if (course) {
 			setCourseInfo(course);
 		}
-	}, [courseId, coursesInLocalStorage]);
+	}, [courseId, courses]);
 
-	const renderAuthors = (authors: AuthorType[]): string => {
-		return authors
-			.map((author) => {
-				if (typeof author === 'string') {
-					return getAuthorNames(author);
-				} else {
-					return author.name;
-				}
-			})
-			.join(', ');
+	const getAuthorNames = (authorId: string[]): string => {
+		const authorsName = authorsInRedux
+			.filter((author) => authorId.includes(author.id))
+			.map((author) => author.name);
+		return authorsName.join(', ');
 	};
 
 	useEffect(() => {
 		getCourseInfo();
 	}, [getCourseInfo]);
-
-	useEffect(() => {
-		const courses = localStorage.getItem('courses');
-		if (courses) {
-			setCoursesInLocalStorage(JSON.parse(courses));
-		}
-	}, []);
 
 	return (
 		<>
@@ -130,7 +77,7 @@ const CourseIngo = (): JSX.Element => {
 							</li>
 							<li>
 								<strong>Authors: </strong>
-								{Array.isArray(authors) ? renderAuthors(authors) : 'No authors'}
+								{authors && authors.length > 0 && getAuthorNames(authors)}
 							</li>
 						</ul>
 					</div>

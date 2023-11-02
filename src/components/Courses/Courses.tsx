@@ -1,73 +1,64 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import CourseCard from './components/CourseCard/CourseCard';
-import {
-	mockedCoursesList,
-	mockedAuthorsList,
-} from '../../helpers/mocks/mocks';
 import Input from '../../common/Input/Input';
 import Button from '../../common/Button/Button';
 import { useNavigate } from 'react-router-dom';
 import Header from '../Header/Header';
-
-interface Course {
-	title: string;
-	authors: {
-		id: string;
-		name: string;
-	}[];
-	description: string;
-	duration: number;
-	creationDate: string;
-	id: string;
-}
-
-const getAuthorNames = (
-	authorIdsOrNames: (string | { id: string; name: string })[]
-): { id: string; name: string }[] => {
-	return authorIdsOrNames.map((authorIdOrName) => {
-		if (typeof authorIdOrName === 'string') {
-			const author = mockedAuthorsList.find((a) => a.id === authorIdOrName);
-			return author
-				? { id: author.id, name: author.name }
-				: { id: '', name: authorIdOrName };
-		} else {
-			return authorIdOrName;
-		}
-	});
-};
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../store/rootReducer';
+import { deleteCourseAction } from '../../store/courses/actions';
+import { getAuthors, getCourses } from '../../services';
 
 const Courses = (): JSX.Element => {
-	const [courses, setCourses] = useState(() => {
-		return mockedCoursesList.map((course) => ({
-			...course,
-			authors: getAuthorNames(course.authors),
-		}));
-	});
+	const dispatch = useDispatch();
+	const authors = useSelector((state: RootState) => state.authors);
+	const courses = useSelector((state: RootState) => state.courses);
 
 	const navigate = useNavigate();
 
-	useEffect(() => {
-		const storedCourses = localStorage.getItem('courses');
-		if (storedCourses) {
-			const parsedCourses: Course[] = JSON.parse(storedCourses);
-
-			// Existia un bug extraño donde duplicaba los cursos, por eso hago este chequeo
-			setCourses((prevState) => {
-				const combinedCourses = [...prevState, ...parsedCourses];
-				const uniqueCourses = Array.from(
-					new Set(combinedCourses.map((course) => course.id))
-				).map((id) => {
-					const course = combinedCourses.find((course) => course.id === id);
-					if (!course) {
-						throw new Error(`Course not found for id ${id}`);
-					}
-					return course;
-				});
-
-				return uniqueCourses;
+	const fetchCourses = useCallback(async () => {
+		try {
+			const response = await getCourses();
+			dispatch({
+				type: 'GET_COURSES',
+				payload: response.result,
 			});
+		} catch (error) {
+			// eslint-disable-next-line
+			console.error(error);
 		}
-	}, []);
+	}, [dispatch]);
+
+	const fetchAuthors = useCallback(async () => {
+		try {
+			const response = await getAuthors();
+			dispatch({
+				type: 'GET_AUTHORS',
+				payload: response.result,
+			});
+		} catch (error) {
+			// eslint-disable-next-line
+			console.error(error);
+		}
+	}, [dispatch]);
+
+	const deleteCourse = (id: string): void => {
+		dispatch(deleteCourseAction(id));
+	};
+
+	useEffect(() => {
+		if (authors.length === 0) {
+			fetchAuthors();
+		}
+		if (courses.length === 0) {
+			fetchCourses();
+		}
+
+		const token = localStorage.getItem('token');
+		if (!token) {
+			navigate('/login');
+		}
+	}, [fetchAuthors, fetchCourses, authors.length, courses.length, navigate]);
 
 	return (
 		<>
@@ -105,6 +96,7 @@ const Courses = (): JSX.Element => {
 						authors={course.authors}
 						duration={course.duration}
 						createdAt={course.creationDate}
+						deleteCourseFn={() => deleteCourse(course.id)}
 					/>
 				))}
 			</div>

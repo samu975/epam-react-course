@@ -8,19 +8,23 @@ import Registration from './components/Registration/Registration';
 import Login from './components/Login/Login';
 import Courses from './components/Courses/Courses';
 import CourseInfo from './components/CourseInfo/CourseInfo';
+import { Provider } from 'react-redux';
+import store from '../src/store/store';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-	<React.StrictMode>
-		<BrowserRouter>
-			<Routes>
-				<Route path='/' element={<App />} />
-				<Route path='/courses/add' element={<AddNewCourse />} />
-				<Route path='/registration' element={<Registration />} />
-				<Route path='/login' element={<Login />} />
-				<Route path='/courses' element={<Courses />} />
-				<Route path='/courses/:courseId' element={<CourseInfo />} />
-			</Routes>
-		</BrowserRouter>
-	</React.StrictMode>
+	<Provider store={store}>
+		<React.StrictMode>
+			<BrowserRouter>
+				<Routes>
+					<Route path='/' element={<App />} />
+					<Route path='/courses/add' element={<AddNewCourse />} />
+					<Route path='/registration' element={<Registration />} />
+					<Route path='/login' element={<Login />} />
+					<Route path='/courses' element={<Courses />} />
+					<Route path='/courses/:courseId' element={<CourseInfo />} />
+				</Routes>
+			</BrowserRouter>
+		</React.StrictMode>
+	</Provider>
 );

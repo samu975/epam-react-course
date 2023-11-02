@@ -4,17 +4,9 @@ import Input from '../../common/Input/Input';
 import { MoonLoader } from 'react-spinners';
 import Button from '../../common/Button/Button';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-
-interface LoginResponse {
-	data: {
-		result: string;
-		user: {
-			name: string;
-			email: string;
-		};
-	};
-}
+import { login } from '../../services';
+import { useDispatch } from 'react-redux';
+import { LoginResponseInterface } from '../../interfaces/Services.interface';
 
 const Login = (): JSX.Element => {
 	const navigate = useNavigate();
@@ -25,29 +17,39 @@ const Login = (): JSX.Element => {
 	const [error, setError] = useState<string>('');
 	const [success, setSuccess] = useState<string>('');
 
-	const sendToLocalStorage = (response: LoginResponse): void => {
-		localStorage.setItem('token', response.data.result);
-		localStorage.setItem('name', response.data.user.name);
-		localStorage.setItem('email', response.data.user.email);
+	const dispatch = useDispatch();
+
+	const sendToLocalStorage = (response: LoginResponseInterface): void => {
+		localStorage.setItem('token', response.result);
+		localStorage.setItem('name', response.user.name);
+		localStorage.setItem('email', response.user.email);
 	};
 
-	const onSubmit = (): void => {
-		setLoading(true);
-		axios
-			.post('http://localhost:4000/login', {
-				email: email,
-				password: password,
-			})
-			.then((response) => {
-				sendToLocalStorage(response);
-				showSuccess();
-				redirect();
-			})
-			.catch((error) => {
-				setLoading(false);
-				// eslint-disable-next-line
-				console.log(error);
-			});
+	const sendToRedux = (response: LoginResponseInterface): void => {
+		dispatch({
+			type: 'LOGIN',
+			payload: {
+				...response.user,
+				token: response.result,
+				isAuth: true,
+			},
+		});
+	};
+
+	const onSubmit = async (): Promise<void> => {
+		try {
+			setLoading(true);
+			const response = await login(email, password);
+			sendToLocalStorage(response);
+			sendToRedux(response);
+			showSuccess();
+			redirect();
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		} catch (error: any) {
+			setError(error.response.data.errors[0]);
+		} finally {
+			setLoading(false);
+		}
 	};
 
 	const validateForm = (): boolean => {
@@ -71,7 +73,7 @@ const Login = (): JSX.Element => {
 	const redirect = (): void => {
 		setTimeout(() => {
 			navigate('/courses');
-		}, 3000);
+		}, 1500);
 	};
 
 	return (

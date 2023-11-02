@@ -7,7 +7,6 @@ function App(): JSX.Element {
 
 	useEffect(() => {
 		const token = localStorage.getItem('token');
-
 		if (token) {
 			navigate('/courses');
 		} else {
