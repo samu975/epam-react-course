@@ -7,6 +7,7 @@ import {
 import Input from '../../common/Input/Input';
 import Button from '../../common/Button/Button';
 import { useNavigate } from 'react-router-dom';
+import Header from '../Header/Header';
 
 interface Course {
 	title: string;
@@ -70,6 +71,7 @@ const Courses = (): JSX.Element => {
 
 	return (
 		<>
+			<Header />
 			<section className='p-4 w-full flex justify-between'>
 				<div>
 					<Input
@@ -80,13 +82,14 @@ const Courses = (): JSX.Element => {
 					<Button
 						buttonText='Search'
 						className='py-2 px-8 ml-4 rounded-md bg-blue-700 text-white'
+						disabled
 					/>
 				</div>
 				<div>
 					<Button
 						buttonText='Add new course'
 						onClick={() => {
-							navigate('add-new-course');
+							navigate('/courses/add');
 						}}
 						className='py-2 px-8 rounded-md bg-cyan-500 text-white'
 					/>
@@ -95,7 +98,8 @@ const Courses = (): JSX.Element => {
 			<div>
 				{courses.map((course) => (
 					<CourseCard
-						key={course.id}
+						id={course.id}
+						key={course.title}
 						title={course.title}
 						description={course.description}
 						authors={course.authors}

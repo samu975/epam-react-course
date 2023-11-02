@@ -1,15 +1,20 @@
-import React from 'react';
-import Header from './components/Header/Header';
+import React, { useEffect } from 'react';
 import './App.css';
-import Courses from './components/Courses/Courses';
+import { useNavigate } from 'react-router-dom';
 
 function App(): JSX.Element {
-	return (
-		<>
-			<Header />
-			<Courses />
-		</>
-	);
+	const navigate = useNavigate();
+
+	useEffect(() => {
+		const token = localStorage.getItem('token');
+
+		if (token) {
+			navigate('/courses');
+		} else {
+			navigate('/login');
+		}
+	}, [navigate]);
+	return <></>;
 }
 
 export default App;

@@ -1,18 +1,7 @@
 import React from 'react';
 import Button from '../../../../common/Button/Button';
-
-interface Author {
-	id: string;
-	name: string;
-}
-
-interface CourseCardProps {
-	title: string;
-	description: string;
-	authors: Author[];
-	duration: number;
-	createdAt: string;
-}
+import { CourseCardInterface } from '../../../../interfaces/CourseCard.interface';
+import { useNavigate } from 'react-router';
 
 const showAuthors = (authors: string[]): JSX.Element[] => {
 	return authors.map((author, index) => (
@@ -43,7 +32,9 @@ const CourseCard = ({
 	authors,
 	duration,
 	createdAt,
-}: CourseCardProps): JSX.Element => {
+	id,
+}: CourseCardInterface): JSX.Element => {
+	const navigate = useNavigate();
 	return (
 		<>
 			<section className='courses p-4 flex gap-4 border border-solid border-blue-300 mx-4 borer my-6 rounded-lg'>
@@ -51,7 +42,7 @@ const CourseCard = ({
 					<h2 className='font-bold text-2xl my-4 ml-4'>{title}</h2>
 					<p className='px-4 w-10/12'>{description}</p>
 				</div>
-				<div className='flex flex-2 flex-col justify-center px-4 items-center min-w-[250px] max-w-[250px]'>
+				<div className='flex flex-2 flex-col justify-center px-4 items-center max-w-[250px]'>
 					<div className='my-4'>
 						<p>
 							<strong>Authors: </strong>
@@ -68,8 +59,10 @@ const CourseCard = ({
 					</div>
 					<Button
 						buttonText='Show course'
+						onClick={() => {
+							navigate(`${id}`);
+						}}
 						className='bg-cyan-500 text-white p-2 rounded-md'
-						disabled={true}
 					/>
 				</div>
 			</section>
