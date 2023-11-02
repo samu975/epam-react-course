@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import CourseCard from './components/CourseCard/CourseCard';
 import {
-  mockedCoursesList,
-  mockedAuthorsList,
-} from "../../helpers/mocks/mocks";
-import Input from "../../common/Input/Input";
-import Button from "../../common/Button/Button";
-import { useNavigate } from "react-router-dom";
-import { getDurationInHours } from "../../helpers/getCourseDuration";
-import { getCreationDate } from "../../helpers/formatCreationDate";
-import Header from "../Header/Header";
+	mockedCoursesList,
+	mockedAuthorsList,
+} from '../../helpers/mocks/mocks';
+import Input from '../../common/Input/Input';
+import Button from '../../common/Button/Button';
+import { useNavigate } from 'react-router-dom';
+import Header from '../Header/Header';
 
 interface Course {
 	title: string;
@@ -47,14 +45,6 @@ const Courses = (): JSX.Element => {
 	});
 
 	const navigate = useNavigate();
-  const showAuthors = (authors: string[]) => {
-    return authors.map((author, index) => (
-      <span key={index}>
-        {author}
-        {index < authors.length - 1 ? ", " : ""}
-      </span>
-    ));
-  };
 
 	useEffect(() => {
 		const storedCourses = localStorage.getItem('courses');
@@ -81,6 +71,7 @@ const Courses = (): JSX.Element => {
 
 	return (
 		<>
+			<Header />
 			<section className='p-4 w-full flex justify-between'>
 				<div>
 					<Input
@@ -91,13 +82,14 @@ const Courses = (): JSX.Element => {
 					<Button
 						buttonText='Search'
 						className='py-2 px-8 ml-4 rounded-md bg-blue-700 text-white'
+						disabled
 					/>
 				</div>
 				<div>
 					<Button
 						buttonText='Add new course'
 						onClick={() => {
-							navigate('add-new-course');
+							navigate('/courses/add');
 						}}
 						className='py-2 px-8 rounded-md bg-cyan-500 text-white'
 					/>
@@ -106,7 +98,8 @@ const Courses = (): JSX.Element => {
 			<div>
 				{courses.map((course) => (
 					<CourseCard
-						key={course.id}
+						id={course.id}
+						key={course.title}
 						title={course.title}
 						description={course.description}
 						authors={course.authors}
@@ -117,55 +110,6 @@ const Courses = (): JSX.Element => {
 			</div>
 		</>
 	);
-  useEffect(() => {
-    const storedCourses = localStorage.getItem("course");
-    if (storedCourses) {
-      const parsedCourses = JSON.parse(storedCourses);
-      setCourses([...mockedCoursesList, parsedCourses]);
-    }
-  }, []);
-
-  return (
-    <>
-      <Header />
-      <section className="p-4 w-full flex justify-between">
-        <div>
-          <Input
-            id="searchInput"
-            className="border-solid border border-gray-400 w-72 p-2 text-sm"
-            type="text"
-          />
-          <Button
-            buttonText="Search"
-            onClick={() => {}}
-            className="py-2 px-8 ml-4 rounded-md bg-blue-700 text-white"
-          />
-        </div>
-        <div>
-          <Button
-            buttonText="Add new course"
-            onClick={() => {
-              navigate("add");
-            }}
-            className="py-2 px-8 rounded-md bg-cyan-500 text-white"
-          />
-        </div>
-      </section>
-      <div>
-        {courses.map((course) => (
-          <CourseCard
-            key={course.id}
-            id={course.id}
-            title={course.title}
-            description={course.description}
-            authors={showAuthors(getAuthorNames(course.authors))}
-            duration={getDurationInHours(course.duration)}
-            createdAt={getCreationDate(course.creationDate)}
-          />
-        ))}
-      </div>
-    </>
-  );
 };
 
 export default Courses;

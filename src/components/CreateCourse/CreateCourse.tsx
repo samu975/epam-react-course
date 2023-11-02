@@ -104,6 +104,7 @@ const CreateCourse = (): JSX.Element => {
 					</div>
 					<div>
 						<Button
+							preventDefault={true}
 							buttonText='Add author'
 							onClick={() => {
 								if (!authors.find((a) => a.id === author.id)) {
@@ -139,6 +140,7 @@ const CreateCourse = (): JSX.Element => {
 							</div>
 							<div className='flex justify-center items-center'>
 								<Button
+									preventDefault={true}
 									buttonText='Create course'
 									onClick={() => {
 										validateForm();
@@ -177,6 +179,7 @@ const CreateCourse = (): JSX.Element => {
 									}}
 								/>
 								<Button
+									preventDefault={true}
 									buttonText='Create author'
 									onClick={onClickAddAuthor}
 									className='border border-solid p-2 bg-cyan-500 w-32 text-white rounded-md'

@@ -1,11 +1,12 @@
 import React from 'react';
 
 interface ButtonProps {
-  buttonText: string;
-  onClick: () => void;
-  disabled?: boolean;
-  className?: string;
-  type?: "button" | "submit" | "reset";
+	buttonText: string;
+	onClick?: () => void;
+	disabled?: boolean;
+	className?: string;
+	type?: 'button' | 'submit' | 'reset';
+	preventDefault?: boolean;
 }
 
 const Button = (props: ButtonProps): JSX.Element => {
@@ -13,7 +14,8 @@ const Button = (props: ButtonProps): JSX.Element => {
 		<button
 			disabled={props.disabled}
 			onClick={(e) => {
-				e.preventDefault();
+				props.preventDefault && e.preventDefault();
+
 				props.onClick && props.onClick();
 			}}
 			className={`${props.className}`}
