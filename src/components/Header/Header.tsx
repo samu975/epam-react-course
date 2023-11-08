@@ -2,14 +2,18 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Logo from './components/Logo/Logo';
 import Button from '../../common/Button/Button';
 import { Link, useNavigate } from 'react-router-dom';
+import { logout } from '../../services';
 
 const Header = (): JSX.Element => {
 	const navigate = useNavigate();
 
 	const [logged, setLogged] = useState<boolean>(false);
 	const [name, setName] = useState<string | null>(null);
+	const [tokenLocalStorage] = useState<string | null>(
+		localStorage.getItem('token')
+	);
 
-	const getFromLocalStorage = (): void => {
+	const getTokenFromLocalStorage = (): void => {
 		if (localStorage.getItem('token')) {
 			setLogged(true);
 		}
@@ -21,17 +25,27 @@ const Header = (): JSX.Element => {
 		}
 	}, [logged]);
 
-	const Logout = (): void => {
-		localStorage.removeItem('token');
-		localStorage.removeItem('name');
-		localStorage.removeItem('email');
-		setLogged(false);
+	const Logout = (token: string): void => {
+		logout(token)
+			.then(() => {
+				localStorage.removeItem('token');
+				localStorage.removeItem('name');
+				localStorage.removeItem('email');
+				localStorage.removeItem('role');
+				setLogged(false);
+				setName(null);
+				navigate('/');
+			})
+			.catch((error) => {
+				// eslint-disable-next-line
+				console.error(error);
+			});
 	};
 
 	useEffect(() => {
-		getFromLocalStorage();
+		getTokenFromLocalStorage();
 		getNameFromLocalStorage();
-	}, [getNameFromLocalStorage]);
+	}, [getNameFromLocalStorage, getTokenFromLocalStorage]);
 
 	return (
 		<header className='w-full flex justify-between px-8 py-4 border border-solid '>
@@ -46,7 +60,9 @@ const Header = (): JSX.Element => {
 							buttonText='Logout'
 							className='bg-red-500 text-white px-4 py-2 rounded'
 							onClick={() => {
-								Logout();
+								if (tokenLocalStorage) {
+									Logout(tokenLocalStorage);
+								}
 								navigate('/');
 							}}
 						/>

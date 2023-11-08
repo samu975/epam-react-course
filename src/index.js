@@ -8,8 +8,11 @@ import Registration from './components/Registration/Registration';
 import Login from './components/Login/Login';
 import Courses from './components/Courses/Courses';
 import CourseInfo from './components/CourseInfo/CourseInfo';
+import UpdateCourse from './pages/UpdateCourse';
 import { Provider } from 'react-redux';
 import store from '../src/store/store';
+import PrivateRoute from './components/PrivateRoute/PrivateRoute';
+import PrivateRouteAdmin from './components/PrivateRoute/PrivateRouteAdmin';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -18,11 +21,43 @@ root.render(
 			<BrowserRouter>
 				<Routes>
 					<Route path='/' element={<App />} />
-					<Route path='/courses/add' element={<AddNewCourse />} />
 					<Route path='/registration' element={<Registration />} />
 					<Route path='/login' element={<Login />} />
-					<Route path='/courses' element={<Courses />} />
-					<Route path='/courses/:courseId' element={<CourseInfo />} />
+
+					<Route
+						path='/courses/add'
+						element={
+							<PrivateRouteAdmin>
+								<AddNewCourse />
+							</PrivateRouteAdmin>
+						}
+					/>
+					<Route
+						path='/courses'
+						element={
+							<PrivateRoute>
+								<Courses />
+							</PrivateRoute>
+						}
+					/>
+
+					<Route
+						path='/courses/:courseId'
+						element={
+							<PrivateRoute>
+								<CourseInfo />
+							</PrivateRoute>
+						}
+					/>
+
+					<Route
+						path='courses/update/:courseId'
+						element={
+							<PrivateRouteAdmin>
+								<UpdateCourse />
+							</PrivateRouteAdmin>
+						}
+					/>
 				</Routes>
 			</BrowserRouter>
 		</React.StrictMode>

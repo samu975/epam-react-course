@@ -1,32 +1,29 @@
-import React, { useEffect, useState } from 'react';
-import { v4 as uuid } from 'uuid';
+import React, { useCallback, useEffect, useState } from 'react';
 import Input from '../../common/Input/Input';
 import Button from '../../common/Button/Button';
 import TextArea from '../../common/TextArea/TextArea';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store/rootReducer';
+import { addAuthorThunk, deleteAuthorThunk } from '../../store/authors/thunk';
+import { AddNewAuthorResponse } from '../../interfaces/Services.interface';
+import { AuthorType } from '../../store/authors/types';
+import { addCourseThunk, updateCourseThunk } from '../../store/courses/thunk';
 
-interface Author {
-	id: string;
-	name: string;
-}
-
-const CreateCourse = (): JSX.Element => {
+const CourseForm = (): JSX.Element => {
 	const navigate = useNavigate();
-	const dispatch = useDispatch();
-
+	//eslint-disable-next-line
+	const dispatch = useDispatch<any>();
+	const { courseId } = useParams();
 	const [duration, setDuration] = useState(0);
-	const [authorList, setAuthorList] = useState<string[]>([]);
 	const [authorIdList, setAuthorIdList] = useState<string[]>([]);
+	const [authorList, setAuthorList] = useState<string[]>([]);
 	const [courseTitle, setCourseTitle] = useState('');
 	const [courseDescription, setCourseDescription] = useState('');
 	const [newAuthorName, setNewAuthorName] = useState('');
 	const authors = useSelector((state: RootState) => state.authors);
-
-	const generateRandomId = (): string => {
-		return uuid();
-	};
+	const coursesRedux = useSelector((state: RootState) => state.courses);
+	const token = localStorage.getItem('token');
 
 	const onClickAddAuthor = (): void => {
 		if (
@@ -38,14 +35,23 @@ const CreateCourse = (): JSX.Element => {
 			return;
 		}
 
-		const newAuthor: Author = {
-			id: generateRandomId().toString(),
+		const newAuthor: AuthorType = {
 			name: newAuthorName,
+			id: '',
 		};
-		dispatch({
-			type: 'ADD_AUTHOR',
-			payload: newAuthor,
-		});
+		if (token) {
+			dispatch(addAuthorThunk(token, newAuthor))
+				.then((response: AddNewAuthorResponse) => {
+					if (response) {
+						setAuthorIdList([...authorIdList, response.result.id]);
+					}
+				})
+				// eslint-disable-next-line
+				.catch((error: any) => {
+					// eslint-disable-next-line
+					console.error(error.response.data.message);
+				});
+		}
 	};
 
 	const getDurationInHours = (duration: number): string => {
@@ -68,6 +74,20 @@ const CreateCourse = (): JSX.Element => {
 		return `${month}/${day}/${year}`;
 	};
 
+	const onClickAddAuthorToCourse = (authorName: string): void => {
+		const author = authors.find((a) => a.name === authorName);
+		if (author && !authorIdList.includes(author.id)) {
+			setAuthorIdList([...authorIdList, author.id]);
+		}
+	};
+
+	const getAuthorsName = (authorId: string[]): string[] => {
+		const authorsName = authors
+			.filter((author) => authorId.includes(author.id))
+			.map((author) => author.name);
+		return authorsName;
+	};
+
 	const validateForm = (): void => {
 		if (
 			!courseTitle.trim() ||
@@ -85,38 +105,72 @@ const CreateCourse = (): JSX.Element => {
 				duration,
 				description: courseDescription,
 				creationDate: getDateNow(),
-				id: generateRandomId().toString(),
+				id: '',
 			};
 
-			dispatch({
-				type: 'ADD_COURSE',
-				payload: course,
-			});
+			if (token && !courseId) {
+				dispatch(addCourseThunk(token, course));
+			} else if (token && courseId) {
+				dispatch(updateCourseThunk(token, courseId, course));
+			}
 			alert('Course saved successfully!');
 			navigate('/');
 		}
 	};
+
+	const deleteAuthorFromLayout = (authorId: string): void => {
+		if (token) {
+			dispatch(deleteAuthorThunk(token, authorId))
+				.then(() => {
+					const updatedAuthorIdList = authorIdList.filter(
+						(id) => id !== authorId
+					);
+					setAuthorIdList(updatedAuthorIdList);
+					const updatedAuthorList = authorList.filter(
+						(authorName) =>
+							authors.find((a) => a.id === authorId)?.name !== authorName
+					);
+					setAuthorList(updatedAuthorList);
+				})
+				// eslint-disable-next-line
+				.catch((error: any) => {
+					// eslint-disable-next-line
+					console.error(error.response.data.message);
+				});
+		}
+	};
+
+	const getCourseInfo = useCallback(() => {
+		return coursesRedux.find((course) => course.id === courseId);
+	}, [courseId, coursesRedux]);
 
 	const showAuthors = (): JSX.Element[] => {
 		return authors.map((author) => {
 			return (
 				<div
 					className='flex justify-between w-full gap-20 my-2'
-					key={author.id}
+					key={author.name}
 				>
-					<div key={author.id}>
+					<div key={author.name}>
 						<h3>{author.name}</h3>
 					</div>
-					<div>
+					<div className='flex gap-2'>
 						<Button
 							buttonText='Add author'
 							onClick={() => {
 								if (!authorList.includes(author.name)) {
 									setAuthorList([...authorList, author.name]);
-									setAuthorIdList([...authorIdList, author.id]);
+									onClickAddAuthorToCourse(author.name);
 								}
 							}}
 							className='bg-green-500 py-2 px-6 rounded-md text-white'
+						/>
+						<Button
+							buttonText='Delete author'
+							onClick={() => {
+								deleteAuthorFromLayout(author.id);
+							}}
+							className='bg-red-500 py-2 px-6 rounded-md text-white'
 						/>
 					</div>
 				</div>
@@ -129,7 +183,21 @@ const CreateCourse = (): JSX.Element => {
 		if (!token) {
 			navigate('/login');
 		}
-	});
+	}, []);
+
+	useEffect(() => {
+		if (courseId) {
+			const courseToEdit = getCourseInfo();
+
+			if (courseToEdit) {
+				setCourseTitle(courseToEdit.title);
+				setCourseDescription(courseToEdit.description);
+				setDuration(courseToEdit.duration);
+				setAuthorIdList(courseToEdit.authors.map((author) => author));
+				setAuthorList(getAuthorsName(courseToEdit.authors));
+			}
+		}
+	}, []);
 
 	return (
 		<>
@@ -144,6 +212,7 @@ const CreateCourse = (): JSX.Element => {
 								placeHolder='Enter title...'
 								className='border-solid border border-gray-400 w-72 p-2 text-sm my-2 rounded-md'
 								minLength={2}
+								value={courseTitle}
 								onChange={(event) => {
 									setCourseTitle(event.target.value);
 								}}
@@ -168,6 +237,7 @@ const CreateCourse = (): JSX.Element => {
 						onchange={(event) => {
 							setCourseDescription(event.target.value);
 						}}
+						value={courseDescription}
 					/>
 				</div>
 			</section>
@@ -202,6 +272,7 @@ const CreateCourse = (): JSX.Element => {
 								label='Duration'
 								placeHolder='Enter duration in minutes...'
 								onChange={onChangeDuration}
+								value={duration.toString()}
 							/>
 							<h4>
 								Duration:{' '}
@@ -219,9 +290,22 @@ const CreateCourse = (): JSX.Element => {
 							Course author
 						</h4>
 						{authorList.length > 0 ? (
-							authorList.map((author) => {
-								return <h4 key={author}>{author}</h4>;
-							})
+							<>
+								{authorList.map((author, index) => {
+									return <h4 key={index}>{author}</h4>;
+								})}
+								{authorList.length > 0 && (
+									<Button
+										buttonText='Delete last'
+										className='bg-red-500 text-white p-2 rounded-md'
+										onClick={() => {
+											const updatedAuthorList = [...authorList];
+											updatedAuthorList.pop();
+											setAuthorList(updatedAuthorList);
+										}}
+									/>
+								)}
+							</>
 						) : (
 							<h4 className='w-full text-center mt-4'>Author list is empty</h4>
 						)}
@@ -232,4 +316,4 @@ const CreateCourse = (): JSX.Element => {
 	);
 };
 
-export default CreateCourse;
+export default CourseForm;

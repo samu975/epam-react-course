@@ -7,6 +7,7 @@ interface TextAreaProps {
 	placeHolder?: string;
 	minLegth?: number;
 	onchange?: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
+	value?: string;
 }
 
 const TextArea = (props: TextAreaProps): JSX.Element => {
@@ -19,6 +20,7 @@ const TextArea = (props: TextAreaProps): JSX.Element => {
 				placeholder={props.placeHolder}
 				minLength={props.minLegth}
 				onChange={props.onchange}
+				value={props.value}
 			/>
 		</>
 	);

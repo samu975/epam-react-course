@@ -19,6 +19,8 @@
     "react-router-dom": "^6.17.0",
     "react-scripts": "5.0.1",
     "react-spinners": "^0.13.8",
+    "redux": "^4.2.1",
+    "redux-thunk": "^2.4.2",
     "reselect": "^4.1.8",
     "web-vitals": "^2.1.4"
   },
@@ -52,6 +54,7 @@
     ]
   },
   "devDependencies": {
+    "@types/react-redux": "^7.1.28",
     "@types/reselect": "^2.2.0",
     "@types/uuid": "^9.0.6",
     "eslint": "^8.52.0",

@@ -7,6 +7,7 @@ export interface LoginResponseInterface {
 	user: {
 		email: string;
 		name: string;
+		role: string;
 	};
 }
 
@@ -26,6 +27,42 @@ export interface GetAuthrosResponse {
 }
 
 export interface DeleteCourseResponse {
+	succesful: boolean;
+	result: string;
+}
+
+export interface GetOwnInfoResponse {
+	succesful: boolean;
+	result: {
+		email: string;
+		name: string;
+	};
+}
+
+export interface AddNewCourseResponse {
+	succesful: boolean;
+	result: string;
+}
+
+export interface LogoutResponse {
+	succesful: boolean;
+	result: string;
+}
+
+export interface AddNewAuthorResponse {
+	succesful: boolean;
+	result: {
+		name: string;
+		id: string;
+	};
+}
+
+export interface UpdateCourseResponse {
+	succesful: boolean;
+	result: string;
+}
+
+export interface DeleteAuthorResponse {
 	succesful: boolean;
 	result: string;
 }

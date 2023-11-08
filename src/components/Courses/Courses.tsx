@@ -7,26 +7,18 @@ import Header from '../Header/Header';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store/rootReducer';
 import { deleteCourseAction } from '../../store/courses/actions';
-import { getAuthors, getCourses } from '../../services';
+import { getAuthors } from '../../services';
+import { getCoursesThunk } from '../../store/courses/thunk';
 
 const Courses = (): JSX.Element => {
-	const dispatch = useDispatch();
+	//eslint-disable-next-line
+	const dispatch = useDispatch<any>();
 	const authors = useSelector((state: RootState) => state.authors);
 	const courses = useSelector((state: RootState) => state.courses);
 
 	const navigate = useNavigate();
-
-	const fetchCourses = useCallback(async () => {
-		try {
-			const response = await getCourses();
-			dispatch({
-				type: 'GET_COURSES',
-				payload: response.result,
-			});
-		} catch (error) {
-			// eslint-disable-next-line
-			console.error(error);
-		}
+	const fetchCourses = useCallback(() => {
+		dispatch(getCoursesThunk());
 	}, [dispatch]);
 
 	const fetchAuthors = useCallback(async () => {

@@ -6,6 +6,7 @@ export type AuthorType = {
 export enum AuthorsActionTypes {
 	ADD_AUTHOR = 'ADD_AUTHOR',
 	GET_AUTHORS = 'GET_AUTHORS',
+	DELETE_AUTHOR = 'DELETE_AUTHOR',
 }
 
 export type AddNewAuthorAction = {
@@ -18,4 +19,12 @@ export type GetAuthorsAction = {
 	payload: AuthorType[];
 };
 
-export type AuthorsActions = AddNewAuthorAction | GetAuthorsAction;
+export type DeleteAuthoR = {
+	type: AuthorsActionTypes.DELETE_AUTHOR;
+	payload: string;
+};
+
+export type AuthorsActions =
+	| AddNewAuthorAction
+	| GetAuthorsAction
+	| DeleteAuthoR;

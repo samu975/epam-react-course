@@ -5,8 +5,10 @@ import { MoonLoader } from 'react-spinners';
 import Button from '../../common/Button/Button';
 import { Link, useNavigate } from 'react-router-dom';
 import { login } from '../../services';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { LoginResponseInterface } from '../../interfaces/Services.interface';
+import { getOwnInfoThunk } from '../../store/user/thunk';
+import { RootState } from '../../store/rootReducer';
 
 const Login = (): JSX.Element => {
 	const navigate = useNavigate();
@@ -17,23 +19,19 @@ const Login = (): JSX.Element => {
 	const [error, setError] = useState<string>('');
 	const [success, setSuccess] = useState<string>('');
 
-	const dispatch = useDispatch();
+	//eslint-disable-next-line
+	const dispatch = useDispatch<any>();
+	const user = useSelector((state: RootState) => state.user);
 
 	const sendToLocalStorage = (response: LoginResponseInterface): void => {
 		localStorage.setItem('token', response.result);
 		localStorage.setItem('name', response.user.name);
 		localStorage.setItem('email', response.user.email);
+		localStorage.setItem('role', user.role);
 	};
 
-	const sendToRedux = (response: LoginResponseInterface): void => {
-		dispatch({
-			type: 'LOGIN',
-			payload: {
-				...response.user,
-				token: response.result,
-				isAuth: true,
-			},
-		});
+	const sendToRedux = (token: string): void => {
+		dispatch(getOwnInfoThunk(token));
 	};
 
 	const onSubmit = async (): Promise<void> => {
@@ -41,12 +39,12 @@ const Login = (): JSX.Element => {
 			setLoading(true);
 			const response = await login(email, password);
 			sendToLocalStorage(response);
-			sendToRedux(response);
+			sendToRedux(response.result);
 			showSuccess();
 			redirect();
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (error: any) {
-			setError(error.response.data.errors[0]);
+			setError(error.response.data.result);
 		} finally {
 			setLoading(false);
 		}

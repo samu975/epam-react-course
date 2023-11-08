@@ -5,6 +5,7 @@ export const initUserState = {
 	email: '',
 	token: '',
 	isAuth: false,
+	role: '',
 };
 
 export const userReducer = (
@@ -16,6 +17,8 @@ export const userReducer = (
 			return action.payload;
 		case UserActionTypes.LOGOUT:
 			return initUserState;
+		case UserActionTypes.GET_OWN_INFO:
+			return action.payload;
 		default:
 			return state;
 	}

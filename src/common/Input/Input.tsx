@@ -8,6 +8,7 @@ interface InputProps {
 	placeHolder?: string;
 	minLength?: number;
 	onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+	value?: string;
 }
 
 const Input = (props: InputProps): JSX.Element => {
@@ -21,6 +22,7 @@ const Input = (props: InputProps): JSX.Element => {
 				placeholder={props.placeHolder}
 				onChange={props.onChange}
 				minLength={props.minLength}
+				value={props.value}
 			/>
 		</>
 	);
