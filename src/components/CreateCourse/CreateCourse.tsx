@@ -120,6 +120,21 @@ const CreateCourse = (): JSX.Element => {
 		});
 	};
 
+	const onDeleteAuthor = (authorName: string): void => {
+		const filteredAuthors = authorList.filter(
+			(author) => author !== authorName
+		);
+		setAuthorList(filteredAuthors);
+
+		const authorToDelete = authors.find((author) => author.name === authorName);
+		if (authorToDelete) {
+			const filteredAuthorIds = authorIdList.filter(
+				(id) => id !== authorToDelete.id
+			);
+			setAuthorIdList(filteredAuthorIds);
+		}
+	};
+
 	useEffect(() => {
 		const token = localStorage.getItem('token');
 		if (!token) {
@@ -216,7 +231,20 @@ const CreateCourse = (): JSX.Element => {
 						</h4>
 						{authorList.length > 0 ? (
 							authorList.map((author) => {
-								return <h4 key={author}>{author}</h4>;
+								return (
+									<>
+										<div className='w-full flex justify-between my-4 items-center'>
+											<h4 key={author}>{author}</h4>
+											<Button
+												buttonText='Delete '
+												className='bg-red-500 py-2 px-6 rounded-md text-white'
+												onClick={() => {
+													onDeleteAuthor(author);
+												}}
+											/>
+										</div>
+									</>
+								);
 							})
 						) : (
 							<h4 className='w-full text-center mt-4'>Author list is empty</h4>
