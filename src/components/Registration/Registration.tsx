@@ -24,7 +24,11 @@ const Registration = (): JSX.Element => {
 			redirect();
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (error: any) {
-			setError(error.response.data.errors[0]);
+			if (error.response) {
+				setError(error.response.data.result);
+			} else {
+				setError("Error with the server's response");
+			}
 		} finally {
 			setLoading(false);
 		}

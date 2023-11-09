@@ -16,6 +16,7 @@ const Courses = (): JSX.Element => {
 
 	const navigate = useNavigate();
 
+	// La solucion que propuse fue esta. En ese momento no sabia que eran los thunks, asi que por eso esta así, pero funciona.
 	const fetchCourses = useCallback(async () => {
 		try {
 			const response = await getCourses();

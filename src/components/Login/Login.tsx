@@ -46,7 +46,11 @@ const Login = (): JSX.Element => {
 			redirect();
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (error: any) {
-			setError(error.response.data.errors[0]);
+			if (error.response) {
+				setError(error.response.data.result);
+			} else {
+				setError("Error with the server's response");
+			}
 		} finally {
 			setLoading(false);
 		}
@@ -134,7 +138,7 @@ const Login = (): JSX.Element => {
 					<p>
 						If you not have an account you can{' '}
 						<Link to={'/registration'} className='text-blue-700'>
-							Regitration
+							Registration
 						</Link>
 					</p>
 				</div>

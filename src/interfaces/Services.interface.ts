@@ -1,4 +1,4 @@
-import { AuthorInfoInterface } from './AuthorInfo';
+import { Author } from './Author.interface';
 import { CourseInfoInterface } from './CourseInfo.interface';
 
 export interface LoginResponseInterface {
@@ -17,12 +17,12 @@ export interface RegisterResponseInterface {
 
 export interface GetCoursesResponse {
 	succesful: boolean;
-	result: CourseInfoInterface[];
+	result: Array<CourseInfoInterface>;
 }
 
 export interface GetAuthrosResponse {
 	succesful: boolean;
-	result: AuthorInfoInterface[];
+	result: Array<Author>;
 }
 
 export interface DeleteCourseResponse {

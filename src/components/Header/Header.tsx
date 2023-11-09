@@ -35,7 +35,12 @@ const Header = (): JSX.Element => {
 
 	return (
 		<header className='w-full flex justify-between px-8 py-4 border border-solid '>
-			<div>
+			<div
+				onClick={() => {
+					navigate('/');
+				}}
+				className='cursor-pointer'
+			>
 				<Logo />
 			</div>
 			<div className='flex gap-8 items-center'>

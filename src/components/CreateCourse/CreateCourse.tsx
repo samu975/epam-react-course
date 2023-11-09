@@ -6,11 +6,7 @@ import TextArea from '../../common/TextArea/TextArea';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store/rootReducer';
-
-interface Author {
-	id: string;
-	name: string;
-}
+import { Author } from '../../interfaces/Author.interface';
 
 const CreateCourse = (): JSX.Element => {
 	const navigate = useNavigate();
