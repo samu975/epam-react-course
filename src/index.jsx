@@ -9,7 +9,7 @@ import Login from './components/Login/Login';
 import Courses from './components/Courses/Courses';
 import CourseInfo from './components/CourseInfo/CourseInfo';
 import { Provider } from 'react-redux';
-import store from '../src/store/store';
+import store from './store/store';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

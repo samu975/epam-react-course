@@ -34,25 +34,25 @@ const Registration = (): JSX.Element => {
 		}
 	};
 
+	// Si solo dejo las validaciones del html se envia el formulario, por eso deje esta validacion tambien.
 	const validateForm = (): boolean => {
 		if (name.length < 2) {
 			setError('Name must be at least 2 characters');
 			return false;
-		} else if (email.length < 2) {
+		}
+		if (email.length < 2) {
 			setError('Email must be at least 2 characters');
 			return false;
-		} else if (password.length < 2) {
+		}
+		if (password.length < 2) {
 			setError('Password must be at least 2 characters');
 			return false;
-		} else {
-			return true;
 		}
+		return true;
 	};
 
 	const redirect = (): void => {
-		setTimeout(() => {
-			navigate('/login');
-		}, 3000);
+		navigate('/login');
 	};
 
 	return (

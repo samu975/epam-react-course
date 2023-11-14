@@ -60,12 +60,12 @@ const Login = (): JSX.Element => {
 		if (email.length < 2) {
 			setError('Email must be at least 2 characters');
 			return false;
-		} else if (password.length < 2) {
+		}
+		if (password.length < 2) {
 			setError('Password must be at least 2 characters');
 			return false;
-		} else {
-			return true;
 		}
+		return true;
 	};
 
 	const showSuccess = (): void => {
@@ -75,9 +75,7 @@ const Login = (): JSX.Element => {
 	};
 
 	const redirect = (): void => {
-		setTimeout(() => {
-			navigate('/courses');
-		}, 1500);
+		navigate('/courses');
 	};
 
 	return (
