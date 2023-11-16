@@ -64,7 +64,10 @@ const Courses = (): JSX.Element => {
 	return (
 		<>
 			<Header />
-			<section className='p-4 w-full flex justify-between'>
+			<section
+				data-testid='course-card'
+				className='p-4 w-full flex justify-between'
+			>
 				<div>
 					<Input
 						id='searchInput'

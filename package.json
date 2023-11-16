@@ -4,9 +4,6 @@
   "private": true,
   "dependencies": {
     "@reduxjs/toolkit": "^1.9.7",
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
     "@types/axios": "^0.14.0",
     "@types/jest": "^29.5.6",
     "@types/node": "^20.8.7",
@@ -20,18 +17,21 @@
     "react-scripts": "5.0.1",
     "react-spinners": "^0.13.8",
     "reselect": "^4.1.8",
+    "tsconfig-paths-jest": "^0.0.1",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
     "eject": "react-scripts eject",
     "eslint": "eslint --ext .js --ext .jsx src",
     "eslint:fix": "eslint --fix --ext .js --ext .jsx src",
-    "test:nowatch": "react-scripts test --watchAll=false",
     "prepare": "husky install",
-    "prepublish": "npm run eslint:fix"
+    "prepublish": "npm run eslint:fix && npm run test:nowatch",
+    "test": "jest",
+    "test:nowatch": "jest --watchAll=false",
+    "test --watch": "jest --watch",
+    "test --coverage": "jest --coverage"
   },
   "eslintConfig": {
     "extends": [
@@ -52,13 +52,19 @@
     ]
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
     "@types/reselect": "^2.2.0",
     "@types/uuid": "^9.0.6",
     "eslint": "^8.52.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.1",
     "husky": "^8.0.3",
+    "jest": "^28.1.3",
+    "jest-environment-jsdom": "^28.1.3",
     "prettier": "^3.0.3",
+    "redux-mock-store": "^1.5.4",
     "tailwindcss": "^3.3.3"
   }
 }
